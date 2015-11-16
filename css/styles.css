@@ -1,0 +1,338 @@
+* {
+	font-family:Arial;
+}
+
+.clear {
+	float:none;
+}
+
+body {
+	padding:0px;
+	margin:0px;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+div#swbx-opacity {
+	position:fixed;
+	width:100%;
+	height:100%;
+	background-color:#000000;
+	z-index:10000;
+	opacity:.7;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	filter:alpha(opacity=70);
+}
+
+div#swbx-frame {
+	position:fixed;
+	width:100%;
+	height:100%;
+	z-index:10001;
+}
+
+div#swbx-frame #swbx-frame2 {
+	margin:0 auto;
+	margin-top:100px;
+	z-index:10002;
+	background-color:#ffffff;
+	overflow:auto;
+}
+
+div#swbx-spinner {
+	position:fixed;
+	width:100%;
+	height:100%;
+	z-index:10003;
+}
+
+div#swbx-spinner #swbx-spinner2 {
+	margin:auto;
+	margin-top:300px;
+	width:40px;
+	height:40px;
+	z-index:10004;
+}
+
+div.swbx-content-default {
+	width:550px;
+	height:400px;
+}
+
+.swbx-box-color {
+	fill:#346619;
+	border-color:#346619 !important;
+	stroke:#346619;
+}
+
+.swbx-box-color-error {
+	fill:#c00000;
+	border-color:#c00000 !important;
+	stroke:#c00000;
+}
+
+div.swbx-box-basics {
+	overflow:hidden !important;
+	border-radius:1em;
+}
+
+div.swbx-inner-box-basics {
+	border:solid 2px #346619;
+	margin:2px;
+	padding:2px;
+	border-radius:1em;
+}
+
+div#swbx-box-icon {
+	float:left;
+	width:80px;
+	height:80px;
+}
+
+div#swbx-box-icon circle {
+	stroke-width:3;
+	fill:white;
+}
+
+div#swbx-box-icon text {
+	font-size:30px;
+}
+
+div.swbx-edit {
+	width:400px;
+	height:100px;
+}
+
+div.swbx-edit #inner-edit {
+	height:88px;
+}
+
+div.swbx-edit #inner-edit #edit-content {
+	float:left;
+	width:290px;
+	padding:5px 0 0 0;
+}
+
+div.swbx-edit #inner-edit #edit-content #edit-value {
+	width:290px;
+}
+
+div.swbx-edit #inner-edit #edit-content #edit-ok,
+div.swbx-edit #inner-edit #edit-content #edit-cancel {
+	margin:5px 0 0 5px;
+	float:right;
+}
+
+div.swbx-message {
+	width:300px;
+	height:100px;
+}
+
+div.swbx-message #inner-message {
+	height:88px;
+}
+
+div.swbx-message #inner-message #message-text {
+	float:left;
+	width:180px;
+	height:80px;
+	padding:5px 0 0 0;
+}
+
+#fc-container {
+	border:solid 1px black;
+	margin:0 10px 0 0;
+	width:1000px;
+	height:800px;
+	position:relative;
+	float:left;
+	overflow:auto;
+}
+
+#fc-toolbar {
+	width:60px;
+	height:790px;
+	float:left;
+	border:solid 1px black;
+	padding:5px;
+	margin:0 10px 0 10px;
+}
+
+#fc-toolbar div:hover {
+	cursor:pointer;
+}
+
+#fc-toolbar img:hover {
+}
+
+.toolbar-node {
+	stroke:#ffbbbb;
+	stroke-width:3;
+	fill:white;
+}
+.toolbar-node-line {
+	stroke:#ffbbbb;
+	stroke-width:3;
+	fill:none;
+}
+.toolbar-node-filled {
+	stroke:#ffbbbb;
+	stroke-width:3;
+	fill:#ffbbbb;
+}
+
+#fc-nodebar {
+	width:300px;
+	height:790px;
+	float:left;
+	border:solid 1px black;
+	padding:5px;
+}
+
+#fc-nodebar div {
+	position:relative !important;
+	margin:0 50px 5px 0;
+	float:left;
+}
+
+.fc-node {
+	position:absolute;
+	height:70px;
+	width:70px;
+	padding:0px;
+}
+
+.fc-node-unknow-unknow {
+	border:solid 2px #999999;
+	height:70px;
+	width:70px;
+	border-radius:3em;
+	box-shadow:2px 2px 19px #aaa;
+}
+
+.fc-node p {
+	text-align:center;
+	margin:10px 0 0 0;
+	overflow:hidden;
+}
+
+.fc-node:hover {
+	box-shadow:3px 3px 20px #555;
+}
+
+p.fc-node-svg-text {
+	width:150px;
+	text-align:left;
+}
+
+#fc-container p.fc-node-svg-text_h {
+	margin:-70px 0 0 75px;
+}
+
+#fc-container p.fc-node-svg-text_v {
+	margin:2px 0 0 0;
+}
+
+#fc-nodebar p.fc-node-svg-text {
+	margin:-70px 0 0 75px !important;
+}
+
+.fc-move {
+	cursor:move;
+}
+
+.fc-link {
+	fill:none;
+	stroke:#999999;
+	stroke-width:4;
+}
+
+.fc-link-arrow {
+	fill:#999999;
+}
+
+.fc-link-ending {
+	stroke:black;
+	stroke-width:1;
+	fill:red;
+}
+
+.fc-link-text {
+	position:absolute;
+	background-color:white;
+	border:1px solid black;
+	padding:1px;
+	font-size:0.8em;
+}
+
+.fc-context-menu-container {
+	position:absolute;
+	border:solid 2px black;
+	box-shadow:2px 2px 19px #aaa;
+	background-color:white;
+	padding:0px;
+	font-size:0.8em;
+}
+
+.fc-context-menu-header {
+	background-color:#ffbbbb;
+	padding:5px;
+	border-bottom:solid 2px black;
+	white-space:nowrap;
+}
+
+.fc-context-menu-item {
+	border-left:solid 5px grey;
+	padding:5px;
+	white-space:nowrap;
+}
+
+.fc-context-menu-item:hover {
+	cursor:pointer;
+	background-color:grey;
+}
+
+.fc-context-menu-item-inactive {
+	border-left:solid 5px grey;
+	padding:5px;
+	white-space:nowrap;
+	color:grey;
+}
+
+
+/*
+ * Individual styles for nodes
+ */
+
+.fc-node-start,
+.fc-node-stop,
+.fc-node-exit,
+.fc-node-sleep,
+.fc-node-xor,
+.fc-node-loop,
+.fc-node-delete,
+.fc-node-assign,
+.fc-node-truncate,
+.fc-node-start {
+	border:solid 2px #999999;
+	border-radius:3em;
+	box-shadow:2px 2px 19px #aaa;
+}
+
+.fc-node-process {
+	border:solid 2px #999999;
+	height:70px;
+	width:140px;
+	border-radius: 0.5em;
+	box-shadow:2px 2px 19px #aaa;
+}
+
+.fc-node-call {
+	border:solid 2px #999999;
+	height:70px;
+	width:140px;
+	border-radius:3em;
+	box-shadow:2px 2px 19px #aaa;
+}
