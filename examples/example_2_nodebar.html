@@ -1,0 +1,110 @@
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="../css/styles.css">
+	<script src="../../jquery/jquery.js"></script>
+	<script src="../js/flowchart.js"></script>
+</head>
+
+<body>
+<h1>Bobbel Flowchart - Example 1</h1>
+<p>A simple example to add an nodebar. Now it is possible to edit the flowchart. In this case you need also an context menue.</p>
+
+<!-- Default container you need -->
+<div id="fc-container"></div>
+<div id="fc-nodebar"></div>
+<div class="clear"></div>
+
+<script>
+	
+	// Create a flow chart
+	var fc = new Flowchart();
+	
+	// Add some text nodes templates
+	fc.addNodeTemplateText('call', 'Call', 100);
+	fc.addNodeTemplateText('process', 'Process', 100);
+	
+	// Add some complex svg nodes templates. Every template can be formatet with an own css class named "fc-node-<first-parameter>" e.g. fc-node-start
+	fc.addNodeTemplateSvg('start', 'Start', 100,
+		'<polygon points="25,19 50,36 25,51" style="fill:#999999;stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('stop', 'Stop', 100,
+		'<rect x="23" y="23" width="24" height="24" style="fill:#999999;stroke-width:3;stroke:#999999" />'
+	);
+	fc.addNodeTemplateSvg('exit', 'Exit', 100,
+		'<circle cx="35" cy="35" r="17" stroke="#999999" stroke-width="3" fill="white" />'+
+		'<line x1="35" y1="10" x2="35" y2="35" style="stroke:white;stroke-width:11" />'+
+		'<line x1="35" y1="10" x2="35" y2="35" style="stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('sleep', 'Sleep', 100,
+		'<line x1="26" y1="20" x2="26" y2="50" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="44" y1="20" x2="44" y2="50" style="stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('xor', 'Or', 100,
+		'<line x1="30" y1="20" x2="30" y2="50" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="15" y1="35" x2="30" y2="35" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="30" y1="21" x2="45" y2="21" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="30" y1="49" x2="45" y2="49" style="stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('loop', 'Loop', 100,
+		'<circle cx="35" cy="35" r="17" stroke="#999999" stroke-width="3" fill="white" />'+
+		'<line x1="35" y1="60" x2="35" y2="35" style="stroke:white;stroke-width:15" />'+
+		'<polygon points="26,45 30,51 23,51" style="fill:#999999;stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('delete', 'Delete', 100,
+		'<line x1="20" y1="20" x2="50" y2="50" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="20" y1="50" x2="50" y2="20" style="stroke:#999999;stroke-width:3" />'
+	);
+	fc.addNodeTemplateSvg('assign', 'Assign', 100, 
+		'<line x1="20" y1="20" x2="41" y2="20" style="stroke:#999999;stroke-width:3" />'+
+		'<line x1="40" y1="20" x2="40" y2="40" style="stroke:#999999;stroke-width:3" />'+
+		'<polygon points="36,40 44,40 40,46" style="fill:#999999;stroke:#999999;stroke-width:3" />'+
+		'<rect x="20" y="53" width="30" height="5" style="fill:#ffffff;stroke-width:3;stroke:#999999" />'
+	);
+	fc.addNodeTemplateSvg('truncate', 'Truncate', 100, '<line x1="20" y1="20" x2="50" y2="50" style="stroke:#999999;stroke-width:5" /><line x1="20" y1="50" x2="50" y2="20" style="stroke:#999999;stroke-width:5" />');
+	
+	// Create a nodebar and add node templates to it by the above defined id.
+	var nodebar = fc.addNodebar();
+	nodebar.addNode('start');
+	nodebar.addNode('stop');
+	nodebar.addNode('exit');
+	nodebar.addNode('sleep');
+	nodebar.addNode('xor');
+	nodebar.addNode('loop');
+	nodebar.addNode('delete');
+	nodebar.addNode('assign');
+	nodebar.addNode('truncate');
+	nodebar.addNode('process');
+	nodebar.addNode('call');
+	
+	// Create a node menu and add some standard items
+	menuNode = fc.createMenuNode();
+	menuNode.addHeader('Node Actions');
+	menuNode.addItemAddNodeLink('Add Link');
+	menuNode.addItemEditNodeName('Edit Name');
+	menuNode.addItemRemoveNode('Remove Node');
+	
+	// Create a link menu and add some standard items
+	menuLink = fc.createMenuLink();
+	menuLink.addHeader('Link Actions');
+	menuLink.addItemEditLinkName('Edit Name');
+	menuLink.addItemRemoveLink('Remove Link');
+	
+	// Add some nodes
+	node1 = fc.addNode('Start', 200, 20, 'start');
+	node2 = fc.addNode('Or', 200, 150, 'xor');
+	node3 = fc.addNode('Call', 70, 280, 'call');
+	node4 = fc.addNode('Process', 270, 280, 'process');
+	node5 = fc.addNode('Stop', 200, 410, 'stop');
+	
+	// Add some links
+	fc.addLink(node1, node2, 'some link');
+	fc.addLink(node2, node3, 'an other link');
+	fc.addLink(node2, node4, 'third link');
+	fc.addLink(node3, node5);
+	fc.addLink(node4, node5);
+	
+</script>
+
+</body>
+</html>
