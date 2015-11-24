@@ -7,7 +7,8 @@
 </head>
 
 <body>
-<h1>Bobbel Flowchart - Example 1</h1>
+<h1>Bobbel Flowchart - Example 4 - Load</h1>
+<p>This example shows how you can load a flowchart from a server. If you see here an error than change the path below.</p>
 
 <!-- Default container you need -->
 <div id="fc-toolbar"></div>
@@ -95,9 +96,10 @@
 	menuLink.addItemEditLinkName('Edit Name');
 	menuLink.addItemRemoveLink('Remove Link');
 	
-	// Load an flowchart
+	// Load an flowchart. Add an paramter for an specific flowchart. The server should return data in the json format. E.G.:
+	// {"id":null,"linkType":0,"orientation":0,"nodes":[{"nr":1,"id":"fc-node-1","name":"Start","x":200,"y":20,"type":"start"},{"nr":2,"id":"fc-node-2","name":"Or","x":200,"y":150,"type":"xor"},{"nr":3,"id":"fc-node-3","name":"Call","x":70,"y":280,"type":"call"},{"nr":4,"id":"fc-node-4","name":"Process","x":270,"y":280,"type":"process"},{"nr":5,"id":"fc-node-5","name":"Stop","x":200,"y":410,"type":"stop"}],"links":[{"nr":6,"id":"fc-link-6","name":"some link","source":"fc-node-1","target":"fc-node-2"},{"nr":7,"id":"fc-link-7","name":"an other link","source":"fc-node-2","target":"fc-node-3"},{"nr":8,"id":"fc-link-8","name":"third link","source":"fc-node-2","target":"fc-node-4"},{"nr":9,"id":"fc-link-9","name":"","source":"fc-node-3","target":"fc-node-5"},{"nr":10,"id":"fc-link-10","name":"","source":"fc-node-4","target":"fc-node-5"}]}
 	fc.load('http://localhost/load-flowchart?fc_id=101');
-
+	
 </script>
 
 </body>
