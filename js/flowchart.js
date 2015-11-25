@@ -172,7 +172,7 @@ Flowchart.prototype._setNode = function(name, x, y, type, nr) {
 		type = 'unknow-unknow';
 	}
 	
-	var node = new Node(name, x, y, nr, type);
+	var node = new Node(name, x, y, nr, type, this);
 	node.setMaxExitLinks(nts[type].mel)
 	this.nodes.push(node);
 	
@@ -370,7 +370,7 @@ NT.prototype.createInnerNode = function(name, orientation) {
  * @param y position y
  * @param nr internal unique number
  * @param type id form node template
- * @param target bobblechart or body
+ * @param target bobbleChart or bobbelBody
  */
 Node = function(name, x, y, nr, type, target) {
 	
@@ -387,10 +387,7 @@ Node = function(name, x, y, nr, type, target) {
 	this.type = type;
 	this.maxExitLinks = 1000;
 	this.onMove = false;
-	this.target = bobbelChart;
-	if (typeof target != 'undefined') {
-		this.target = target;
-	}
+	this.target = target;
 	this.draw();
 };
 Node.prototype.nr = null;
@@ -892,11 +889,9 @@ NbNode = function(nt, nb) {
 	this.id = 'fc-node-template-'+this.type;
 	this.element = nt.createNode(this.id);
 	this.element.mousedown(this.moveStart.bind(this));
-	this.width = this.element.width();
-	this.height = this.element.height();
 	nb.element.append(this.element);
 	this.width = this.element.width();
-	this.height = this.element.height();	
+	this.height = this.element.height();
 }
 NbNode.prototype.element = null;
 NbNode.prototype.type = null;
