@@ -895,6 +895,8 @@ NbNode = function(nt, nb) {
 	this.width = this.element.width();
 	this.height = this.element.height();
 	nb.element.append(this.element);
+	this.width = this.element.width();
+	this.height = this.element.height();	
 }
 NbNode.prototype.element = null;
 NbNode.prototype.type = null;
