@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<h1>Bobbel Flowchart - Example 7 - Own Menu and own Tool</h1>
+<h1>Bobbel Flowchart - Example 7 - Own menu and own tool</h1>
 <p>For you own needs you can specify an own menu entry and and own tool.</p>
 
 <!-- Default container you need -->
@@ -80,7 +80,8 @@
 	
 	// Create a toolbar and add some standard tools.
 	var toolbar = fc.addToolbar();
-	toolbar.addToolSave('Save', 'http://localhost/wfs/admin/save-flowchart');
+//	toolbar.addToolSave('Save', 'http://localhost/wfs/admin/save-flowchart');
+toolbar.addToolSave('Save', '/wfs/admin/save-flowchart');
 	toolbar.addToolLinkType('Link Type');
 	toolbar.addToolOrientation('Orientation');
 	
@@ -111,20 +112,63 @@
 	fc.addLink(node3, node5);
 	fc.addLink(node4, node5);
 	
-	// It is possible to add an individual tool.
+
+	
+fc.load('/wfs/admin/load-flowchart?fc_id=101');
+	
+
+	
+	/*
+	 * Create an individual tool
+	 */
 	myOwnToolFunction = function(){
 		alert('Here comes the code for my first individual tool');
 	}
 	toolbar.addTool('mytool1', 'My first tool', '<text x="22" y="40" style="font-size:30px;fill:#ffbbbb;">?</text>', myOwnToolFunction)
 	
-	// Create an individual menu item
-	var itemActive = function() {
+	/*
+	 * Create an individual menu item for a node
+	 */
+	// Return true or false if the menu item shoud be active or not
+	var itemActiveHandler = function(node) {
 		return true;
 	}
-	var item = function() {
-		alert('Here comes the code for my first individual menu item');
+	// Do here anything you want do
+	var itemHandler = function(node) {
+		
+		// Work with properties of the node
+		node.setProperty('key', 'value');
+		var property = node.getProperty('key');
+		var properties = node.getAllProperties();
+		// node.removeProperty('key');
+		
+		alert('Here comes the code for my first individual menu item for node "'+node.id+'" "'+node.name+'"');
 	}
-	menuNode.addItem('Edit Properties', itemActive, item);
+	menuNode.addItem('Edit Properties', itemActiveHandler, itemHandler);
+	
+	/*
+	 * Create an individual menu item for a link
+	 */
+	// Return true or false if the menu item shoud be active or not
+	var itemActiveHandler = function(node) {
+		return true;
+	}
+	// Do here anything you want do
+	var itemHandler = function(link) {
+		
+		console.log(link);
+		
+		// Work with properties of the node
+		link.setProperty('key', 'value');
+		var property = link.getProperty('key');
+		var properties = link.getAllProperties();
+		// link.removeProperty('key');
+		
+		console.log(link);
+		
+		alert('Here comes the code for my first individual menu item for link "'+link.id+'" "'+link.name+'"');
+	}
+	menuLink.addItem('Edit Properties', itemActiveHandler, itemHandler);
 
 </script>
 

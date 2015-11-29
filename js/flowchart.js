@@ -20,7 +20,6 @@ var globalY = 0; // mouse position Y
 var nts = {}; // NodeTemplates
 var bobbelChart = null; // The one and only chart object
 var bobbelBody = null; // The one an only body object
-var bobbelConfig = null; // The one and only configuration object
 
 
 /**
@@ -58,25 +57,24 @@ Body.prototype.chartScrollTop = null;
 Body.prototype.chartPageX = null;
 Body.prototype.chartPageY = null;
 
-
 /**
- * All kind of configuration
+ * Administration and abstract for a lot of classes
  */
-Config = function() {
-	
-	this.elements = {};
-	this.elements['text-error-load-chart'] = 'An error occurred while loading the flowchart!';
-	this.elements['text-error-nodebar-addnode'] = 'nodebar.addNode: The following type is not as a template defined: ';
-	this.elements['text-success-save'] = 'The flowchart was succesfully saved!';
-	this.elements['text-error-server-save'] = 'The server responded following error while saving: ';
-	this.elements['text-error-save'] = 'An error occurred while saving the flowchart!';
+Properties = function() {
+	this.properties = {};
 }
-Config.prototype.elements = null
-Config.prototype.setConfig = function(key, value) {
-	this.elements[key] = value;
+Properties.prototype.properties = null
+Properties.prototype.setProperty = function(key, value) {
+	this.properties[key] = value;
 }
-Config.prototype.getConfig = function(key, value) {
-	return this.elements[key];
+Properties.prototype.getProperty = function(key) {
+	return this.properties[key];
+}
+Properties.prototype.getAllProperties = function(key) {
+	return this.properties;
+}
+Properties.prototype.removeProperty = function(key) {
+	delete(this.properties[key]);
 }
 
 /**
@@ -84,6 +82,7 @@ Config.prototype.getConfig = function(key, value) {
  */
 Flowchart = function() {
 	
+	this.properties = {};
 	this.id = null;
 	this.nodes = new Array();
 	this.links = new Array();
@@ -112,11 +111,19 @@ Flowchart = function() {
 	// set globals
 	bobbelChart = this;
 	bobbelBody = new Body();
-	bobbelConfig = new Config();
 	
 	// Unknow Template
 	this.addNodeTemplateSvg('unknow-unknow', 'Unknow', 1000, '<text x="30" y="40" fill="red">?</text>');
+	
+	// Set Properties
+	this.setProperty('text-error-load-chart', 'An error occurred while loading the flowchart!');
+	this.setProperty('text-error-load-chart', 'An error occurred while loading the flowchart!');
+	this.setProperty('text-error-nodebar-addnode', 'nodebar.addNode: The following type is not as a template defined: ');
+	this.setProperty('text-success-save', 'The flowchart was succesfully saved!');
+	this.setProperty('text-error-server-save', 'The server responded following error while saving: ');
+	this.setProperty('text-error-save', 'An error occurred while saving the flowchart!');
 };
+Flowchart.prototype = new Properties(); // inherited
 Flowchart.prototype.id = null;
 Flowchart.prototype.nodes = null;
 Flowchart.prototype.links = null;
@@ -153,27 +160,31 @@ Flowchart.prototype.load = function(url) {
 				for (var i in result.nodes) {
 					var data = result.nodes[i];
 					this.setSequenze(data.nr);
-					this._setNode(data.name, data.x, data.y, data.type, data.nr);
+					this._setNode(data.name, data.x, data.y, data.type, data.nr, data.properties);
 				}
 				for (var i in result.links) {
 					var data = result.links[i];
 					this.setSequenze(data.nr);
-					this._setLink(this.getNode(data.source), this.getNode(data.target), data.name, data.nr);
+					this._setLink(this.getNode(data.source), this.getNode(data.target), data.name, data.nr, data.properties);
 				}
 			}
 		}.bind(this))
 		.fail(function() {
-			showErrorbox(bobbelConfig.getConfig('text-error-load-chart'), true, 'swbx-message');
+			showErrorbox(bobbelChart.getProperty('text-error-load-chart'), true, 'swbx-message');
 		});
 }
-Flowchart.prototype._setNode = function(name, x, y, type, nr) {
+Flowchart.prototype._setNode = function(name, x, y, type, nr, properties) {
 	
 	if (typeof nts[type] == 'undefined') {
 		type = 'unknow-unknow';
 	}
 	
 	var node = new Node(name, x, y, nr, type, this);
-	node.setMaxExitLinks(nts[type].mel)
+	node.setMaxExitLinks(nts[type].mel);
+	if (typeof properties != 'undefined') {
+
+		node.properties = properties;
+	}
 	this.nodes.push(node);
 	
 	return node;
@@ -182,9 +193,12 @@ Flowchart.prototype.addLink = function(sourceNode, targedNode, name) {
 	
 	return this._setLink(sourceNode, targedNode, name, this.getSequenze());
 };
-Flowchart.prototype._setLink = function(sourceNode, targedNode, name, nr) {
+Flowchart.prototype._setLink = function(sourceNode, targedNode, name, nr, properties) {
 	
 	var link = new Link(sourceNode, targedNode, name, nr);
+	if (typeof properties != 'undefined') {
+		link.properties = properties;
+	}
 	this.links.push(link);
 	
 	return link;
@@ -293,7 +307,7 @@ Flowchart.prototype.switchOrientation = function() {
 	}
 }
 Flowchart.prototype.setConfig = function(key, value) {
-	bobbelConfig.setConfig(key, value)
+	this.setProperty(key, value)
 }
 Flowchart.prototype.disableMovability = function() {
 	this.movability = 0;
@@ -306,7 +320,7 @@ Flowchart.prototype.disableMovability = function() {
  * @param name text to display
  * @param mel max exit links
  * @param inner another inner content (svg)
-  */
+ */
 NT = function(mainType, type, name, mel, inner) {
 	
 	this.mainType = mainType;
@@ -374,6 +388,7 @@ NT.prototype.createInnerNode = function(name, orientation) {
  */
 Node = function(name, x, y, nr, type, target) {
 	
+	this.properties = {};
 	this.name = name;
 	this.nr = nr;
 	this.id = 'fc-node-'+nr;
@@ -390,6 +405,7 @@ Node = function(name, x, y, nr, type, target) {
 	this.target = target;
 	this.draw();
 };
+Node.prototype = new Properties(); // inherited
 Node.prototype.nr = null;
 Node.prototype.id = null;
 Node.prototype.name = null;
@@ -573,29 +589,37 @@ Node.prototype.setName = function(name) {
 Node.prototype.remove = function(remove) {
 	
 	this.element.remove();
-	for (var i in this.target.nodes) {
+	for (var i in bobbelChart.nodes) {
 		
-		var node = this.target.nodes[i];
+		var node = bobbelChart.nodes[i];
 		if (this.id == node.id) {
-			
-			for (var y in this.target.links) {
-				
-				var link = this.target.links[y];
-				if (this.id == link.sourceNode.id || this.id == link.targetNode.id) {
-					this.target.links[y].remove();
-					delete(this.target.links[y]);
-				}
-			}
 			delete(this.target.nodes[i]);
 		}
 	}
+	
+	for (var y in bobbelChart.links) {
+		
+		var link = bobbelChart.links[y];
+		if (this.id == link.sourceNode.id || this.id == link.targetNode.id) {
+			bobbelChart.links[y].remove();
+		}
+	}
+	
 	// ToDo: Remove object
 }
 Node.prototype.setMaxExitLinks = function(amount) {
 	this.maxExitLinks = amount;
 }
 Node.prototype.export = function() {
-	return {nr:this.nr, id:this.id, name:this.name, x:this.x1, y:this.y1, type:this.type};
+	return {
+		nr:this.nr,
+		id:this.id,
+		name:this.name,
+		x:this.x1,
+		y:this.y1,
+		type:this.type,
+		properties:this.getAllProperties()
+	};
 }
 
 /**
@@ -607,6 +631,7 @@ Node.prototype.export = function() {
  */
 Link = function(source, target, name, nr) {
 	
+	this.properties = {};
 	this.x1 = null;
 	this.y1 = null;
 	this.x2 = null;
@@ -624,6 +649,7 @@ Link = function(source, target, name, nr) {
 	
 	this.setTextElement(name);
 };
+Link.prototype = new Properties(); // inherited
 Link.prototype.nr = null;
 Link.prototype.id = null;
 Link.prototype.name = null;
@@ -847,7 +873,14 @@ Link.prototype.removeTextElement = function() {
 	}
 }
 Link.prototype.export = function() {
-	return {nr:this.nr, id:this.id, name:this.name, source:this.sourceNode.id, target:this.targetNode.id};
+	return {
+		nr:this.nr,
+		id:this.id,
+		name:this.name,
+		source:this.sourceNode.id,
+		target:this.targetNode.id,
+		properties:this.getAllProperties()
+	};
 }
 
 /**
@@ -867,7 +900,7 @@ Nb.prototype.addNode = function(type) {
 		this.nodes[type] = new NbNode(nt, this);
 	}
 	else {
-		showErrorbox(bobbelConfig.getConfig('text-error-nodebar-addnode')+type);
+		showErrorbox(bobbelChart.getProperty('text-error-nodebar-addnode')+type);
 	}
 }
 Nb.prototype.getNode = function(type) {
@@ -962,27 +995,25 @@ Menu.prototype.showMenu = function(object, event) {
 		// Add Items
 		for (var i in this.items) {
 			
+			var itemElement = document.createElement('div');
+			itemElement = $(itemElement);
+			itemElement.html(this.items[i][0]);
+			
 			// Check visibility of target function
 			var func = this.items[i][1];
  			if (func(object)) {
 				
-				var itemElement = document.createElement('div');
-				itemElement = $(itemElement);
 				itemElement.addClass('fc-context-menu-item');
-				itemElement.html(this.items[i][0]);
-				itemElement.click(function(){
+				itemElement.click(function() {
 					
-					var func = this[1][2];
 					this[3].remove();
+					var func = this[1][2];
 					func(this[2]);
 					
 				}.bind([this, this.items[i], object, container]));
 			}
 			else {
-				var itemElement = document.createElement('div');
-				itemElement = $(itemElement);
 				itemElement.addClass('fc-context-menu-item-inactive');
-				itemElement.html(this.items[i][0]);
 			}
 			container.append(itemElement);
 		}
@@ -1173,14 +1204,14 @@ Tb.prototype.addToolSave = function(text, url) {
 				result = jQuery.parseJSON(result);
 				if (!result.error) {
 					bobbelChart.id = result.id;
-					showMessagebox(bobbelConfig.getConfig('text-success-save'));
+					showMessagebox(bobbelChart.getProperty('text-success-save'));
 				}
 				else {
-					showErrorbox(bobbelConfig.getConfig('text-error-server-save')+result.message);
+					showErrorbox(bobbelChart.getProperty('text-error-server-save')+result.message);
 				}
 			})
 			.fail(function() {
-				showErrorbox(bobbelConfig.getConfig('text-error-save'));
+				showErrorbox(bobbelChart.getProperty('text-error-save'));
 			});
 	}
 	
