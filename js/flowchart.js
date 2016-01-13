@@ -157,6 +157,7 @@ Flowchart.prototype.load = function(url) {
 				this.id = result.id
 				this.linkType = result.linkType;
 				this.orientation = result.orientation;
+				this.properties = result.properties;
 				for (var i in result.nodes) {
 					var data = result.nodes[i];
 					this.setSequenze(data.nr);
@@ -182,7 +183,6 @@ Flowchart.prototype._setNode = function(name, x, y, type, nr, properties) {
 	var node = new Node(name, x, y, nr, type, this);
 	node.setMaxExitLinks(nts[type].mel);
 	if (typeof properties != 'undefined') {
-
 		node.properties = properties;
 	}
 	this.nodes.push(node);
@@ -403,6 +403,7 @@ Node = function(name, x, y, nr, type, target) {
 	this.maxExitLinks = 1000;
 	this.onMove = false;
 	this.target = target;
+	
 	this.draw();
 };
 Node.prototype = new Properties(); // inherited
@@ -644,6 +645,9 @@ Link = function(source, target, name, nr) {
 	this.textElement = null;
 	this.elementEnding1 = null;
 	this.elementEnding2 = null;
+	this.sourceSiblings = [];
+	this.targetSiblings = [];
+	this.mline = null;
 	
 	this.draw();
 	
@@ -660,10 +664,13 @@ Link.prototype.elementEnding1 = null;
 Link.prototype.elementEnding2 = null;
 Link.prototype.sourceNode = null;
 Link.prototype.targetNode = null;
+Link.prototype.sourceSiblings = null;
+Link.prototype.targetSiblings = null;
 Link.prototype.x1 = null;
 Link.prototype.y1 = null;
 Link.prototype.x2 = null;
 Link.prototype.y2 = null;
+Link.prototype.mline = null;
 Link.prototype.mouseClick = function(eventMouseDown) {
 	
 	if (eventMouseDown.which == 3) {
@@ -716,7 +723,7 @@ Link.prototype.draw = function() {
 	bobbelChart.svg.append(this.arrowElement);
 	
 	// set coordinates
-	this.move();	
+	this.move();
 }
 Link.prototype.drawEnding = function(x, y) {
 	
@@ -757,11 +764,26 @@ Link.prototype.move = function() {
 		this.y2 = (this.targetNode.y2 + this.targetNode.y1) / 2;
 	}
 	
+	this.moveLine();
+	
+	this.moveTextElement();
+	
+	this.moveSiblings();
+	
+	this.moveReset();
+}
+
+
+
+
+
+Link.prototype.moveLine = function() {
+	
 	if (bobbelChart.linkType == 0) {
 		
 		var move = this.x1+','+this.y1+' '+this.x2+','+this.y2;
 		
-		// create an arrow was due browser performace not possible
+		// create an arrow was due browser performance not possible
 		if (this.arrowElement != null) {
 			this.arrowElement.remove();
 			delete(this.arrowElement);
@@ -770,47 +792,199 @@ Link.prototype.move = function() {
 		
 	} else {
 		
+		var m = this.getMLineCoordinate();
 		if (bobbelChart.orientation == 0) {
-			
+		// v
 			// line back
 			if (this.y2 - this.y1 < 30) {
 				var xm = (this.x2 - this.x1) / 2;
-				var move = this.x1+','+this.y1+' '+this.x1+','+(this.y1+20)+' '+(this.x1+xm)+','+(this.y1+20)+' '+(this.x1+xm)+','+(this.y2-20)+' '+this.x2+','+(this.y2-20)+' '+this.x2+','+this.y2;
+				var move = this.x1+','+this.y1+' '+this.x1+','+m+' '+(this.x1+xm)+','+m+' '+(this.x1+xm)+','+(this.y2-20)+' '+this.x2+','+(this.y2-20)+' '+this.x2+','+this.y2;
 			}
 			// direkt
 			else {
-				var ym = (this.y2 + this.y1) / 2;
-				var move = this.x1+','+this.y1+' '+this.x1+','+ym+' '+this.x2+','+ym+' '+this.x2+','+this.y2;
+				var move = this.x1+','+this.y1+' '+this.x1+','+m+' '+this.x2+','+m+' '+this.x2+','+this.y2;
 			}
 			
 			// arrow
 			var attr = (this.x2-5)+','+(this.y2-10)+' '+(this.x2+5)+','+(this.y2-10)+' '+(this.x2)+','+(this.y2-2);
 		} else {
-			
+		// h
 			// line back
 			if (this.x2 - this.x1 < 30) {
 				var ym = (this.y2 - this.y1) / 2;
-				var move = (this.x1+2)+','+this.y1+' '+(this.x1+20)+','+this.y1+' '+(this.x1+20)+','+(this.y1+ym)+' '+(this.x2-20)+','+(this.y1+ym)+' '+(this.x2-20)+','+this.y2+' '+this.x2+','+this.y2;
+				var move = (this.x1+2)+','+this.y1+' '+m+','+this.y1+' '+m+','+(this.y1+ym)+' '+(this.x2-20)+','+(this.y1+ym)+' '+(this.x2-20)+','+this.y2+' '+this.x2+','+this.y2;
 			}
 			// direkt
 			else {
-				var xm = (this.x2 + this.x1) / 2;
-				var move = (this.x1+2)+','+this.y1+' '+xm+','+this.y1+' '+xm+','+this.y2+' '+this.x2+','+this.y2;
+				var move = (this.x1+2)+','+this.y1+' '+m+','+this.y1+' '+m+','+this.y2+' '+this.x2+','+this.y2;
 			}			
 			
 			// arrow
 			var attr = (this.x2-10)+','+(this.y2-5)+' '+(this.x2-10)+','+(this.y2+5)+' '+(this.x2-2)+','+(this.y2);			
 		}
 		
-		this.arrowElement.attr('points', attr);
+		// in case moving a sibling avoid this
+		if (this.arrowElement != null) {
+			this.arrowElement.attr('points', attr);
+		}
 	}
 	
 	// move
 	this.element.attr('points', move);
-	
-	// text
-	this.setTextElementCoordinates();
 }
+
+
+
+
+
+
+
+
+
+
+Link.prototype.moveSiblings = function() {
+	
+	var m = this.getMLineCoordinate();
+	var siblings = this.getSiblings();
+	
+	
+console.log('1:'+this.id+' '+m);
+	
+	
+	if (siblings.source.length > siblings.target.length) {
+	
+		for (var y in siblings.source) {
+			siblings.source[y].mline = this.mline;
+		}
+// Das scheint doch nicht so zu gehen!	
+	}
+	if (siblings.target.length > siblings.source.length) {
+	
+		for (var y in siblings.target) {
+			
+			siblings.target[y].mline = this.mline;
+			siblings.target[y].sourceSiblings = siblings.source;
+			siblings.target[y].targetSiblings = siblings.target;
+			siblings.target[y].moveLine();
+			siblings.target[y].moveTextElement();
+			siblings.target[y].moveReset();
+		}
+	}
+}
+
+
+
+
+
+
+
+
+Link.prototype.getMLineCoordinate = function() {
+	
+	if (this.mline == null) {
+		
+		this.mline = this.calculateMLines(this.x1, this.y1, this.x2, this.y2);
+		var siblings = this.getSiblings();
+
+		if (siblings.source.length > siblings.target.length) {
+			
+			for (var y in siblings.source) {
+				
+				var link = siblings.source[y];
+				
+				var tmp = this.calculateMLines(link.x1, link.y1, link.x2, link.y2);
+				if (tmp < this.mline) {
+					this.mline = tmp;
+				}
+			}
+		}
+		if (siblings.target.length > siblings.source.length) {
+			
+			for (var y in siblings.target) {
+				
+				var link = siblings.target[y];
+				var tmp = this.calculateMLines(link.x1, link.y1, link.x2, link.y2);
+				if (tmp > this.mline) {
+					this.mline = tmp;
+				}
+			}
+		}
+	}
+	
+	return this.mline;
+}
+Link.prototype.calculateMLines = function(x1, y1, x2, y2) {
+	
+	if (bobbelChart.orientation == 0) {
+	// v
+		if (y2 - y1 > 30) {
+			return (y2 + y1) / 2;
+		}
+		else {
+			return y1 + 30;
+		}
+	
+	} else {
+	// h
+		// line back
+		if (x2 - x1 > 30) {
+			return (x2 + x1) / 2;
+		}
+		// direkt
+		else {
+			return x1 + 30;
+		}
+	}
+}
+
+
+
+Link.prototype.getSiblings = function() {
+	
+	if (this.sourceSiblings.length == 0 || this.targetSiblings.length == 0) {
+		
+		this.sourceSiblings = [];
+		this.targetSiblings = [];
+		
+		// called form chart
+		for (var y in bobbelChart.links) {
+			
+			var link = bobbelChart.links[y];
+			if (this.id != link.id) {
+			
+				if (this.sourceNode.id == link.sourceNode.id) {
+					this.sourceSiblings.push(link);
+				}
+				
+				if (this.targetNode.id == link.targetNode.id) {
+					this.targetSiblings.push(link);
+				}
+			}
+		}
+	}
+	return {
+		source: this.sourceSiblings,
+		target: this.targetSiblings
+	};
+}
+
+
+Link.prototype.moveReset = function() {
+	
+	this.mline = null;
+	this.sourceSiblings = [];
+	this.targetSiblings = [];
+
+}
+
+
+
+
+
+
+
+
+
 Link.prototype.remove = function() {
 	
 	this.element.remove();
@@ -836,7 +1010,7 @@ Link.prototype.setTextElement = function(name) {
 	else if (this.textElement != null) {
 		this.textElement.html(name);
 		this.name = name;
-		this.setTextElementCoordinates();
+		this.moveTextElement();
 	}
 	else {
 		this.textElement = document.createElement('div');
@@ -847,22 +1021,50 @@ Link.prototype.setTextElement = function(name) {
 		this.textElement.mouseover(this.highlightingOn.bind(this));
 		this.textElement.mouseout(this.highlightingOff.bind(this));
 		bobbelChart.element.append(this.textElement);
-		this.setTextElementCoordinates();
+		this.moveTextElement();
 		this.name = name;
 	}
 }
-Link.prototype.setTextElementCoordinates = function() {
-	
+Link.prototype.moveTextElement = function() {
+
 	if (this.textElement != null) {
+		
+		var m = this.getMLineCoordinate();
+		var siblings = this.getSiblings();
 		
 		var x = (this.x2 + this.x1) / 2;
 		var y = (this.y2 + this.y1) / 2;
+		
+		if (bobbelChart.linkType == 1) {
+		
+			if (siblings.source.length > siblings.target.length) {
+				x = this.x2;
+				y = (this.y2 + m) / 2;
+			}
+			else if (siblings.target.length > siblings.source.length) {
+				x = this.x1;
+				y = this.y1 + ((m - this.y1) / 2);
+			}
+		}
+		
 		x = x - (this.textElement.width() / 2);
 		y = y - (this.textElement.height() / 2);
 		this.textElement.css('left', x);
 		this.textElement.css('top', y);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 Link.prototype.removeTextElement = function() {
 	
 	if (this.textElement != null) {
@@ -1189,6 +1391,7 @@ Tb.prototype.addToolSave = function(text, url) {
 			id:bobbelChart.id,
 			linkType:bobbelChart.linkType,
 			orientation:bobbelChart.orientation,
+			properties:bobbelChart.getAllProperties(),
 			nodes:new Array(),
 			links:new Array()
 		};
@@ -1340,7 +1543,7 @@ TbTool.prototype.func = null;
 TbTool.prototype.id = null;
 TbTool.prototype.tb = null;
 TbTool.prototype.mouseClick = function(e) {
-	this.func();
+	this.func(bobbelChart);
 }
 
 /**
