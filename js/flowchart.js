@@ -772,11 +772,6 @@ Link.prototype.move = function() {
 	
 	this.moveReset();
 }
-
-
-
-
-
 Link.prototype.moveLine = function() {
 	
 	if (bobbelChart.linkType == 0) {
@@ -798,7 +793,7 @@ Link.prototype.moveLine = function() {
 			// line back
 			if (this.y2 - this.y1 < 30) {
 				var xm = (this.x2 - this.x1) / 2;
-				var move = this.x1+','+this.y1+' '+this.x1+','+m+' '+(this.x1+xm)+','+m+' '+(this.x1+xm)+','+(this.y2-20)+' '+this.x2+','+(this.y2-20)+' '+this.x2+','+this.y2;
+				var move = this.x1+','+this.y1+' '+this.x1+','+(this.y1+30)+' '+(this.x1+xm)+','+(this.y1+30)+' '+(this.x1+xm)+','+m+' '+this.x2+','+m+' '+this.x2+','+this.y2;
 			}
 			// direkt
 			else {
@@ -812,7 +807,7 @@ Link.prototype.moveLine = function() {
 			// line back
 			if (this.x2 - this.x1 < 30) {
 				var ym = (this.y2 - this.y1) / 2;
-				var move = (this.x1+2)+','+this.y1+' '+m+','+this.y1+' '+m+','+(this.y1+ym)+' '+(this.x2-20)+','+(this.y1+ym)+' '+(this.x2-20)+','+this.y2+' '+this.x2+','+this.y2;
+				var move = (this.x1+2)+','+this.y1+' '+(this.x1+30)+','+this.y1+' '+(this.x1+30)+','+(this.y1+ym)+' '+m+','+(this.y1+ym)+' '+m+','+this.y2+' '+this.x2+','+this.y2;
 			}
 			// direkt
 			else {
@@ -832,53 +827,6 @@ Link.prototype.moveLine = function() {
 	// move
 	this.element.attr('points', move);
 }
-
-
-
-
-
-
-
-
-
-
-Link.prototype.moveSiblings = function() {
-	
-	var m = this.getMLineCoordinate();
-	var siblings = this.getSiblings();
-	
-	
-console.log('1:'+this.id+' '+m);
-	
-	
-	if (siblings.source.length > siblings.target.length) {
-	
-		for (var y in siblings.source) {
-			siblings.source[y].mline = this.mline;
-		}
-// Das scheint doch nicht so zu gehen!	
-	}
-	if (siblings.target.length > siblings.source.length) {
-	
-		for (var y in siblings.target) {
-			
-			siblings.target[y].mline = this.mline;
-			siblings.target[y].sourceSiblings = siblings.source;
-			siblings.target[y].targetSiblings = siblings.target;
-			siblings.target[y].moveLine();
-			siblings.target[y].moveTextElement();
-			siblings.target[y].moveReset();
-		}
-	}
-}
-
-
-
-
-
-
-
-
 Link.prototype.getMLineCoordinate = function() {
 	
 	if (this.mline == null) {
@@ -891,7 +839,6 @@ Link.prototype.getMLineCoordinate = function() {
 			for (var y in siblings.source) {
 				
 				var link = siblings.source[y];
-				
 				var tmp = this.calculateMLines(link.x1, link.y1, link.x2, link.y2);
 				if (tmp < this.mline) {
 					this.mline = tmp;
@@ -921,7 +868,7 @@ Link.prototype.calculateMLines = function(x1, y1, x2, y2) {
 			return (y2 + y1) / 2;
 		}
 		else {
-			return y1 + 30;
+			return y2 - 20;
 		}
 	
 	} else {
@@ -932,13 +879,39 @@ Link.prototype.calculateMLines = function(x1, y1, x2, y2) {
 		}
 		// direkt
 		else {
-			return x1 + 30;
+			return x2 - 20;
 		}
 	}
 }
-
-
-
+Link.prototype.moveSiblings = function() {
+	
+	var m = this.getMLineCoordinate();
+	var siblings = this.getSiblings();
+	
+	if (siblings.source.length > siblings.target.length) {
+	
+		for (var y in siblings.source) {
+			siblings.source[y].mline = this.mline;
+			siblings.source[y].sourceSiblings = siblings.source;
+			siblings.source[y].targetSiblings = siblings.target;
+			siblings.source[y].moveLine();
+			siblings.source[y].moveTextElement();
+			siblings.source[y].moveReset();
+		}
+	}
+	if (siblings.target.length > siblings.source.length) {
+	
+		for (var y in siblings.target) {
+			
+			siblings.target[y].mline = this.mline;
+			siblings.target[y].sourceSiblings = siblings.source;
+			siblings.target[y].targetSiblings = siblings.target;
+			siblings.target[y].moveLine();
+			siblings.target[y].moveTextElement();
+			siblings.target[y].moveReset();
+		}
+	}
+}
 Link.prototype.getSiblings = function() {
 	
 	if (this.sourceSiblings.length == 0 || this.targetSiblings.length == 0) {
@@ -967,8 +940,6 @@ Link.prototype.getSiblings = function() {
 		target: this.targetSiblings
 	};
 }
-
-
 Link.prototype.moveReset = function() {
 	
 	this.mline = null;
@@ -976,15 +947,6 @@ Link.prototype.moveReset = function() {
 	this.targetSiblings = [];
 
 }
-
-
-
-
-
-
-
-
-
 Link.prototype.remove = function() {
 	
 	this.element.remove();
@@ -1039,11 +1001,23 @@ Link.prototype.moveTextElement = function() {
 		
 			if (siblings.source.length > siblings.target.length) {
 				x = this.x2;
-				y = (this.y2 + m) / 2;
+				
+				if (this.y2 - this.y1 > 30) {
+					y = (this.y2 + m) / 2;
+				}
+				else {
+					y = this.y1 + (30 / 2);
+				}
 			}
 			else if (siblings.target.length > siblings.source.length) {
 				x = this.x1;
-				y = this.y1 + ((m - this.y1) / 2);
+				
+				if (this.y2 - this.y1 > 30) {
+					y = this.y1 + ((m - this.y1) / 2);
+				}
+				else {
+					y = this.y1 + (30 / 2);
+				}
 			}
 		}
 		
@@ -1053,18 +1027,6 @@ Link.prototype.moveTextElement = function() {
 		this.textElement.css('top', y);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 Link.prototype.removeTextElement = function() {
 	
 	if (this.textElement != null) {
