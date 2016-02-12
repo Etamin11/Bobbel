@@ -276,6 +276,10 @@ Flowchart.prototype.addNodeTemplateSvg = function(type, name, mel, svg) {
 	
 	nts[type] = new NT('svg', type, name, mel, svg);
 }
+Flowchart.prototype.addNodeTemplateImg = function(type, name, mel, img) {
+	
+	nts[type] = new NT('img', type, name, mel, img);
+}
 Flowchart.prototype.switchLineType = function() {
 
 	if (this.linkType == 0) {
@@ -341,6 +345,11 @@ NT.prototype.createNode = function(id, name) {
 	element.addClass('fc-node');
 	element.addClass('fc-node-'+this.type);
 	element.attr('id', id);
+	
+	if (this.mainType == 'img') {
+		element.css('background-image', 'url(\''+this.inner+'\')');
+	}
+	
 	var inner = this.createInnerNode(name);
 	element.append(inner);
 	
@@ -365,6 +374,17 @@ NT.prototype.createInnerNode = function(name, orientation) {
 			inner += '<p class="fc-node-svg-text fc-node-svg-text_v">'+name+'</p>';
 		}
 	}
+	
+	// Image Node
+//	else if (this.mainType == 'img') {
+//		
+//		var inner = '<div style="background-image: url(\''+this.inner+'\');">'
+//			+ '<p style="height:70px;weight:70px">'+name+'</p>'
+//			+ '</div>';
+//		var inner = '<img src="'+this.inner+'" boarder="0" />';
+//		var inner = '<div>'+name+'</div>';
+//	}
+	
 	// Default Text Node
 	else {
 		

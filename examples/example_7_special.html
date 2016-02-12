@@ -41,12 +41,6 @@
 		'<line x1="26" y1="20" x2="26" y2="50" style="stroke:#999999;stroke-width:3" />'+
 		'<line x1="44" y1="20" x2="44" y2="50" style="stroke:#999999;stroke-width:3" />'
 	);
-	fc.addNodeTemplateSvg('xor', 'Or', 100,
-		'<line x1="30" y1="20" x2="30" y2="50" style="stroke:#999999;stroke-width:3" />'+
-		'<line x1="15" y1="35" x2="30" y2="35" style="stroke:#999999;stroke-width:3" />'+
-		'<line x1="30" y1="21" x2="45" y2="21" style="stroke:#999999;stroke-width:3" />'+
-		'<line x1="30" y1="49" x2="45" y2="49" style="stroke:#999999;stroke-width:3" />'
-	);
 	fc.addNodeTemplateSvg('loop', 'Loop', 1,
 		'<circle cx="35" cy="35" r="17" stroke="#999999" stroke-width="3" fill="white" />'+
 		'<line x1="35" y1="60" x2="35" y2="35" style="stroke:white;stroke-width:15" />'+
@@ -63,6 +57,9 @@
 		'<rect x="20" y="53" width="30" height="5" style="fill:#ffffff;stroke-width:3;stroke:#999999" />'
 	);
 	fc.addNodeTemplateSvg('truncate', 'Truncate', 1, '<line x1="20" y1="20" x2="50" y2="50" style="stroke:#999999;stroke-width:5" /><line x1="20" y1="50" x2="50" y2="20" style="stroke:#999999;stroke-width:5" />');
+	
+	// Add some image nodes
+	fc.addNodeTemplateImg('xor', 'Or', 100, '/fc/img/rhomb.png');
 	
 	// Create a nodebar and add node templates to it by the above defined id.
 	var nodebar = fc.addNodebar();
@@ -106,11 +103,11 @@ toolbar.addToolSave('Save', '/wfs/admin/save-flowchart');
 	node5 = fc.addNode('Stop', 200, 410, 'stop');
 	
 	// Add some links
-	fc.addLink(node1, node2, 'some link');
-	fc.addLink(node2, node3, 'an other link');
-	fc.addLink(node2, node4, 'third link');
-	fc.addLink(node3, node5);
-	fc.addLink(node4, node5);
+//	fc.addLink(node1, node2, 'some link');
+//	fc.addLink(node2, node3, 'an other link');
+//	fc.addLink(node2, node4, 'third link');
+//	fc.addLink(node3, node5);
+//	fc.addLink(node4, node5);
 	
 
 	
@@ -121,7 +118,14 @@ fc.load('/wfs/admin/load-flowchart?fc_id=101');
 	/*
 	 * Create an individual tool
 	 */
-	myOwnToolFunction = function(){
+	myOwnToolFunction = function(chart) {
+		
+		// Work with properties of the chart
+		chart.setProperty('key', 'value');
+		var property = chart.getProperty('key');
+		var properties = chart.getAllProperties();
+		// chart.removeProperty('key');
+		
 		alert('Here comes the code for my first individual tool');
 	}
 	toolbar.addTool('mytool1', 'My first tool', '<text x="22" y="40" style="font-size:30px;fill:#ffbbbb;">?</text>', myOwnToolFunction)
