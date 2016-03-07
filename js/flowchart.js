@@ -90,8 +90,6 @@ Flowchart = function() {
 	this.element = $('#fc-container');
 	this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	this.svg = $(this.svg);
-	this.svg.attr('height', '100%');
-	this.svg.attr('width', '100%');
 	this.element.append(this.svg);
 	this.nb = null;
 	this.tb = null;
@@ -375,16 +373,6 @@ NT.prototype.createInnerNode = function(name, orientation) {
 		}
 	}
 	
-	// Image Node
-//	else if (this.mainType == 'img') {
-//		
-//		var inner = '<div style="background-image: url(\''+this.inner+'\');">'
-//			+ '<p style="height:70px;weight:70px">'+name+'</p>'
-//			+ '</div>';
-//		var inner = '<img src="'+this.inner+'" boarder="0" />';
-//		var inner = '<div>'+name+'</div>';
-//	}
-	
 	// Default Text Node
 	else {
 		
@@ -450,12 +438,17 @@ Node.prototype.draw = function() {
 		this.element = null;
 	}
 	
+	// draw
 	var nt = nts[this.type];
 	this.element = nt.createNode(this.id, this.name);
 	this.element.css('left', this.x1);
 	this.element.css('top', this.y1);
-	this.element.mousedown(this.mouseClick.bind(this));
 	this.target.element.append(this.element);
+	
+	// register events
+	this.element.mousedown(this.mouseClick.bind(this));
+	
+	// save edges
 	this.width = this.element.width();
 	this.height = this.element.height();
 	this.x2 = this.x1 + this.width;
@@ -723,10 +716,12 @@ Link.prototype.draw = function() {
 	this.element = $(this.element);
 	this.element.attr('id', this.id);
 	this.element.attr('class', 'fc-link');
+	bobbelChart.svg.append(this.element);
+	
+	// register events
 	this.element.mousedown(this.mouseClick.bind(this));
 	this.element.mouseover(this.highlightingOn.bind(this));
 	this.element.mouseout(this.highlightingOff.bind(this));
-	bobbelChart.svg.append(this.element);
 	
 	// delete line
 	if (this.arrowElement != null) {

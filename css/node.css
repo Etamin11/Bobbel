@@ -1,0 +1,43 @@
+/*
+ * Individual styles for nodes
+ */
+
+.fc-node-start,
+.fc-node-stop,
+.fc-node-exit,
+.fc-node-sleep,
+.fc-node-loop,
+.fc-node-delete,
+.fc-node-assign,
+.fc-node-truncate,
+.fc-node-start {
+	border:solid 2px #999999;
+	border-radius:3em;
+	box-shadow:2px 2px 19px #aaa;
+}
+
+.fc-node-xor {
+	height:69px;
+	width:69px;
+	margin:2px 0 0 1px;
+}
+
+.fc-node-xor:hover {
+	box-shadow:none;
+}
+
+.fc-node-process {
+	border:solid 2px #999999;
+	height:70px;
+	width:140px;
+	border-radius: 0.5em;
+	box-shadow:2px 2px 19px #aaa;
+}
+
+.fc-node-call {
+	border:solid 2px #999999;
+	height:70px;
+	width:140px;
+	border-radius:3em;
+	box-shadow:2px 2px 19px #aaa;
+}
